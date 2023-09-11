@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../constants";
 import styles from "./newRivals.style";
+import { ProductList } from "../components";
 const NewRivals = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
@@ -19,6 +20,7 @@ const NewRivals = ({ navigation }) => {
           </TouchableOpacity>
           <Text style={styles.heading}>Products</Text>
         </View>
+        <ProductList />
       </View>
     </SafeAreaView>
   );
