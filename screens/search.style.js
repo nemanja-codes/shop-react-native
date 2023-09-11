@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   searchImage: {
+    marginLeft: 20,
     resizeMode: "contain",
     width: SIZES.width - 100,
     height: SIZES.height - 300,
