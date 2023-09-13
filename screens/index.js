@@ -4,4 +4,18 @@ import Profile from "./Profile";
 import Cart from "./Cart";
 import ProductDetails from "./ProductDetails";
 import NewRivals from "./NewRivals";
-export { Home, Search, Profile, NewRivals, Cart, ProductDetails };
+import LoginPage from "./LoginPage";
+import Orders from "./Orders";
+import Favorites from "./Favorites";
+
+export {
+  Home,
+  Search,
+  Profile,
+  NewRivals,
+  Cart,
+  ProductDetails,
+  LoginPage,
+  Orders,
+  Favorites,
+};
