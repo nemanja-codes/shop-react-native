@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native";
 
 const ProductRow = () => {
   const { data, isLoading, error } = useFetch();
-  const products = [1, 2, 3, 4];
+
   return (
     <View style={styles.container}>
       {isLoading ? (
