@@ -81,7 +81,7 @@ const Profile = ({ navigation }) => {
             style={styles.cover}
           />
         </View>
-        <View style={style.profileContainer}>
+        <View style={styles.profileContainer}>
           <Image
             source={require("../assets/images/profile.jpeg")}
             style={styles.profile}
