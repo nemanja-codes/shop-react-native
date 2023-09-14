@@ -90,7 +90,7 @@ const Profile = ({ navigation }) => {
             {userLogin === true ? "John Doe" : "Please login to your account"}
           </Text>
           {userLogin === false ? (
-            <TouchableOpacity onPress={() => navigation.navigation("Login")}>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <View style={styles.loginBtn}>
                 <Text style={styles.menuText}>L O G I N</Text>
               </View>
