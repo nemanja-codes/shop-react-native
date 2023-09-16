@@ -1,26 +1,27 @@
-import React from "react";
-import { useState } from "react";
 import {
   ScrollView,
   Text,
   View,
   TouchableOpacity,
   Image,
+  TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BackBtn from "../components/BackBtn";
 import styles from "./login.style";
-import Button from "../components/Button";
+import { Button, BackBtn, TxtInput } from "../components";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { COLORS } from "../constants";
-import { TextInput } from "react-native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
-    .min(8, "Must be 8 characters or more")
+    .min(8, "Password must be at least 8 character")
     .required("Required"),
   email: Yup.string()
     .email("Provide a valid email address")
@@ -32,8 +33,8 @@ const LoginPage = ({ navigation }) => {
   const [responseData, setResponseData] = useState(null);
   const [obsecureText, setObsecureText] = useState(false);
 
-  const invalidForm = () => {
-    Alert.alert("Invalid Form", "Please provide all required fiels", [
+  const inValidForm = () => {
+    Alert.alert("Invalid Form", "Please provide all required fields", [
       {
         text: "Cancel",
         onPress: () => {},
@@ -42,12 +43,63 @@ const LoginPage = ({ navigation }) => {
         text: "Continue",
         onPress: () => {},
       },
-      {
-        defaultIndex: 1,
-      },
+      { defaultIndex: 1 },
     ]);
   };
 
+  const login = async (values) => {
+    setLoader(true);
+
+    try {
+      const endpoint = "http://localhost:3000/api/login";
+      const data = values;
+
+      const response = await axios.post(endpoint, data);
+      if (response.status === 200) {
+        setResponseData(response.data);
+        
+        await AsyncStorage.setItem("id", JSON.stringify(response.data._id));
+        await AsyncStorage.setItem("token", JSON.stringify(response.data.token));
+        await AsyncStorage.setItem(`user${response.data._id}`, JSON.stringify(response.data));
+        setLoader(false);
+
+        navigation.replace('Bottom Navigation')
+      } else {
+        Alert.alert("Error Logging in ", "Please provide valid credentials ", [
+          {
+            text: "Cancel",
+            onPress: () => {},
+          },
+          {
+            text: "Continue",
+            onPress: () => {},
+          },
+          { defaultIndex: 1 },
+        ]);
+      }
+    } catch (error) {
+      Alert.alert(
+        "Error ",
+        "Oops, Error logging in try again with correct credentials",
+        [
+          {
+            text: "Cancel",
+            onPress: () => {},
+          },
+          {
+            text: "Continue",
+            onPress: () => {},
+          },
+          { defaultIndex: 1 },
+        ]
+      );
+    } finally {
+      setLoader(false);
+    }
+  };
+
+
+  
   return (
     <ScrollView>
       <SafeAreaView style={{ marginHorizontal: 20 }}>
@@ -62,13 +114,13 @@ const LoginPage = ({ navigation }) => {
           <Formik
             initialValues={{ email: "", password: "" }}
             validationSchema={validationSchema}
-            onSubmit={(values) => console.log(values)}
+            onSubmit={(values) => login(values)}
           >
             {({
               handleChange,
               handleBlur,
-              handleSubmit,
               touched,
+              handleSubmit,
               values,
               errors,
               isValid,
@@ -86,14 +138,17 @@ const LoginPage = ({ navigation }) => {
                       name="email-outline"
                       size={20}
                       color={COLORS.gray}
-                      style={styles.iconStyles}
+                      style={styles.iconStyle}
                     />
+
                     <TextInput
                       placeholder="Enter email"
                       onFocus={() => {
                         setFieldTouched("email");
                       }}
-                      onBlur={setFieldTouched("email", "")}
+                      onBlur={() => {
+                        setFieldTouched("email", "");
+                      }}
                       value={values.email}
                       onChangeText={handleChange("email")}
                       autoCapitalize="none"
@@ -117,22 +172,30 @@ const LoginPage = ({ navigation }) => {
                       name="lock-outline"
                       size={20}
                       color={COLORS.gray}
-                      style={styles.iconStyles}
+                      style={styles.iconStyle}
                     />
+
                     <TextInput
                       secureTextEntry={obsecureText}
-                      placeholder="Enter password"
+                      placeholder="Password"
                       onFocus={() => {
                         setFieldTouched("password");
                       }}
-                      onBlur={setFieldTouched("password", "")}
+                      onBlur={() => {
+                        setFieldTouched("password", "");
+                      }}
                       value={values.password}
                       onChangeText={handleChange("password")}
                       autoCapitalize="none"
                       autoCorrect={false}
                       style={{ flex: 1 }}
                     />
-                    <TouchableOpacity onPress={setObsecureText(!obsecureText)}>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        setObsecureText(!obsecureText);
+                      }}
+                    >
                       <MaterialCommunityIcons
                         name={obsecureText ? "eye-outline" : "eye-off-outline"}
                         size={18}
@@ -145,10 +208,21 @@ const LoginPage = ({ navigation }) => {
                 </View>
 
                 <Button
+                  loader={loader}
                   title={"L O G I N"}
-                  onPress={isValid ? handleSubmit : invalidForm}
+                  onPress={isValid ? handleSubmit : inValidForm}
                   isValid={isValid}
                 />
+
+                <Text
+                  style={styles.registration}
+                  onPress={() => {
+                    navigation.navigate("SignUp");
+                  }}
+                >
+                  {" "}
+                  Register{" "}
+                </Text>
               </View>
             )}
           </Formik>

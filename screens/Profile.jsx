@@ -10,6 +10,7 @@ import {
   SimpleLineIcons,
 } from "@expo/vector-icons";
 import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Profile = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
@@ -70,6 +71,31 @@ const Profile = ({ navigation }) => {
       },
     ]);
   };
+
+  useEffect(()=> {
+    checkExistingUser();
+  },[]);
+
+  const checkExistingUser = async () => {
+    const id = await AsyncStorage.getItem('id')
+    const useId = `user${JSON.parse(id)}`;
+    
+    try {
+      const currentUser = await AsyncStorage.getItem(useId);
+
+      if(currentUser !== null){
+        const parsedData = JSON.parse(currentUser)
+        setUserData(parsedData)
+        setUserLogin(true)
+      }else{
+        navigation.navigate('Login')
+      }
+    } catch (error) {
+      console.log("Error retrieving the data:", error)
+    }
+
+  };
+
 
   return (
     <View style={styles.container}>
